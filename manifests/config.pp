@@ -6,7 +6,7 @@ class puppetdashboard::config inherits puppetdashboard::params {
 
   exec { "puppetdashboard::config::puppetlabs_apt_repo_config":
     cwd     => "/tmp"
-    command => "wget wget http://apt.puppetlabs.com/puppetlabs-release_1.0-3_all.deb -O puppetlabs.deb; dpkg -i puppetlabs.deb"
+    command => "wget wget http://apt.puppetlabs.com/puppetlabs-release_1.0-3_all.deb -O puppetlabs.deb; dpkg -i puppetlabs.deb",
     notify  => Exec["puppetdashboard::config::update_apt"],
   }
   exec { "puppetdashboard::config::update_apt":

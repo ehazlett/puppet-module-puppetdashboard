@@ -28,7 +28,7 @@ class puppetdashboard::package {
   #   }
   exec { "puppetdashboard::config::puppetlabs_apt_repo_config":
     cwd     => "/tmp",
-    command => "wget http://apt.puppetlabs.com/puppetlabs-release_1.0-3_all.deb -O puppetlabs.deb; dpkg -i puppetlabs.deb",
+    command => "wget ${puppetdashboard::params::puppetlabs_release_deb_url} -O puppetlabs.deb; dpkg -i puppetlabs.deb",
     notify  => Exec["puppetdashboard::config::update_apt"],
   }
   exec { "puppetdashboard::config::update_apt":
@@ -65,20 +65,29 @@ class puppetdashboard::package {
       refreshonly => true,
       notify      => Exec["puppetdashboard::package::dashboard_configure"],
     }
-  }
-  file { "puppetdashboard::package::dashboard_database_config":
-    path    => "/etc/puppet-dashboard/database.yml",
-    content => template("puppetdashboard/database.yml.erb"),
-    owner   => "root",
-    group   => "www-data",
-    mode    => 0640,
-    require => Package["puppet-dashboard"],
-    notify  => Exec["puppetdashboard::package::dashboard_configure"],
-  }
-  exec { "puppetdashboard::package::dashboard_configure":
-    cwd         => "/usr/share/puppet-dashboard/",
-    command     => "rake RAILS_ENV=production db:migrate",
-    require     => File["puppetdashboard::package::dashboard_database_config"],
-    refreshonly => true,
+    file { "puppetdashboard::package::dashboard_database_config":
+      path    => "/etc/puppet-dashboard/database.yml",
+      content => template("puppetdashboard/database.yml.erb"),
+      owner   => "root",
+      group   => "www-data",
+      mode    => 0640,
+      require => Package["puppet-dashboard"],
+      notify  => Exec["puppetdashboard::package::dashboard_configure"],
+    }
+    exec { "puppetdashboard::package::dashboard_configure":
+      cwd         => "/usr/share/puppet-dashboard/",
+      command     => "rake RAILS_ENV=production db:migrate",
+      require     => File["puppetdashboard::package::dashboard_database_config"],
+      refreshonly => true,
+    }
+  } else { # no dashboard sync notification ; just put the template file
+    file { "puppetdashboard::package::dashboard_database_config":
+      path    => "/etc/puppet-dashboard/database.yml",
+      content => template("puppetdashboard/database.yml.erb"),
+      owner   => "root",
+      group   => "www-data",
+      mode    => 0640,
+      require => Package["puppet-dashboard"],
+    }
   }
 }

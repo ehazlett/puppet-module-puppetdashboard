@@ -13,7 +13,7 @@ class puppetdashboard::config inherits puppetdashboard::params {
     notify  => Exec["puppetdashboard::config::get_puppetlabs_apt_key"],
   }
   exec { "puppetdashboard::config::get_puppetlabs_apt_key":
-    command     => "gpg --recv-key 4BD6EC30 --keyserver keys.gnupg.net",
+    command     => "gpg --keyserver keys.gnupg.net --recv-key 4BD6EC30",
     user        => root,
     timeout     => 600,
     refreshonly => true,

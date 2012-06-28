@@ -12,7 +12,7 @@ class puppetdashboard::config inherits puppetdashboard::params {
   exec { "puppetdashboard::config::update_apt":
     command     => "apt-get -y update",
     user        => root,
-    require     => Exec["puppetdashboard::config::import_puppetlabs_apt_key"],
+    require     => Exec["puppetdashboard::config::puppetlabs_apt_repo_config"],
     refreshonly => true,
   }
   file { "puppetdashboard::config::dashboard_default":

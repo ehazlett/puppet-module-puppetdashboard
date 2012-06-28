@@ -16,7 +16,7 @@ class puppetdashboard::package {
   if ! defined(Package["rdoc"]) { package { "rdoc": ensure => installed, } }
   if ! defined(Package["ri"]) { package { "ri": ensure => installed, } }
   if ! defined(Package["ruby"]) { package { "ruby": ensure => installed, } }
-  if ! defined(Package["rubygems"]) { package { "ruby": ensure => installed, } }
+  if ! defined(Package["rubygems"]) { package { "rubygems": ensure => installed, } }
   if ! defined(Package["ruby-dev"]) { package { "ruby-dev": ensure => installed, } }
 
   # exec { "puppetdashboard::package::wget_rubygems":

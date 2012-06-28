@@ -3,6 +3,7 @@
 # This module manages puppetdashboard
 #
 # Parameters:
+#   config_mysql : Install and configure a local MySQL instance
 #   dashboard_db_name : Database name
 #   dashboard_db_username : Database username
 #   dashboard_db_password : Database user password
@@ -17,7 +18,8 @@
 #  include puppetdashboard
 #
 class puppetdashboard (
-    $dashboard_db_name=$puppetdashboard::params::dashboard_db_name, 
+    $config_mysql=$puppetdashboard::params::config_mysql,
+    $dashboard_db_name=$puppetdashboard::params::dashboard_db_name,
     $dashboard_db_username=$puppetdashboard::params::dashboard_db_username,
     $dashboard_db_password=$puppetdashboard::params::dashboard_db_password
   ) inherits puppetdashboard::params {

@@ -1,8 +1,8 @@
 class puppetdashboard::package {
   require "puppetdashboard::config"
 
-  Exec { 
-    path      => "${::path}", 
+  Exec {
+    path      => "${::path}",
     logoutput => on_failure,
   }
 
@@ -24,7 +24,7 @@ class puppetdashboard::package {
   #     command   => "wget ${puppetdashboard::params::rubygems_url} -O rubygems.tar.gz",
   #     creates   => "/usr/bin/gem1.8",
   #     notify    => Exec["puppetdashboard::package::install_rubygems"],
-  #     require   => [ Package["build-essential"], Package["libmysql-ruby"], Package["libmysqlclient-dev"], 
+  #     require   => [ Package["build-essential"], Package["libmysql-ruby"], Package["libmysqlclient-dev"],
   #       Package["libopenssl-ruby"], Package["rake"], Package["rdoc"], Package["ri"], Package["ruby"], Package["ruby-dev"] ]
   #   }
   #   exec { "puppetdashboard::package::install_rubygems":
@@ -39,28 +39,41 @@ class puppetdashboard::package {
   #     refreshonly => true,
   #     require     => Exec["puppetdashboard::package::install_rubygems"],
   #   }
+  exec { "puppetdashboard::config::puppetlabs_apt_repo_config":
+    cwd     => "/tmp",
+    command => "wget wget http://apt.puppetlabs.com/puppetlabs-release_1.0-3_all.deb -O puppetlabs.deb; dpkg -i puppetlabs.deb",
+    notify  => Exec["puppetdashboard::config::update_apt"],
+  }
+  exec { "puppetdashboard::config::update_apt":
+    command     => "apt-get -y update",
+    user        => root,
+    require     => Exec["puppetdashboard::config::puppetlabs_apt_repo_config"],
+    refreshonly => true,
+  }
   package { "puppet-dashboard":
     ensure    => installed,
-    require   => Exec["puppetdashboard::config::puppetlabs_apt_repo_config"],
+    require   => Exec["puppetdashboard::config::update_apt"],
   }
   # mysql config
-  exec { "puppetdashboard::package::create_db":
-    command     => "echo 'CREATE DATABASE ${puppetdashboard::params::dashboard_db_name} CHARACTER SET utf8;' | mysql -u root",
-    require     => [ Package["mysql-server"], Package["puppet-dashboard"] ],
-    notify      => Exec["puppetdashboard::package::create_db_user"],
-    unless      => "echo 'show databases;' | mysql -u root | grep ${puppetdashboard::params::dashboard_db_name}",
-  }
-  exec {"puppetdashboard::package::create_db_user":
-    command     => "echo \"CREATE USER '${puppetdashboard::params::dashboard_db_username}'@'localhost' IDENTIFIED BY '${puppetdashboard::params::dashboard_db_password}';\" | mysql -u root",
-    require     => Exec["puppetdashboard::package::create_db"],
-    notify      => Exec["puppetdashboard::package::grant_db_privs"],
-    refreshonly => true,
-  }
-  exec {"puppetdashboard::package::grant_db_privs":
-    command     => "echo 'GRANT ALL PRIVILEGES ON ${puppetdashboard::params::dashboard_db_name}.* TO \'${puppetdashboard::params::dashboard_db_username}\'@\'localhost\';' | mysql -u root",
-    require     => Exec["puppetdashboard::package::create_db"],
-    refreshonly => true,
-    notify      => Exec["puppetdashboard::package::dashboard_configure"],
+  if ($puppetdashboard::config_mysql) {
+    exec { "puppetdashboard::package::create_db":
+      command     => "echo 'CREATE DATABASE ${puppetdashboard::params::dashboard_db_name} CHARACTER SET utf8;' | mysql -u root",
+      require     => [ Package["mysql-server"], Package["puppet-dashboard"] ],
+      notify      => Exec["puppetdashboard::package::create_db_user"],
+      unless      => "echo 'show databases;' | mysql -u root | grep ${puppetdashboard::params::dashboard_db_name}",
+    }
+    exec {"puppetdashboard::package::create_db_user":
+      command     => "echo \"CREATE USER '${puppetdashboard::params::dashboard_db_username}'@'localhost' IDENTIFIED BY '${puppetdashboard::params::dashboard_db_password}';\" | mysql -u root",
+      require     => Exec["puppetdashboard::package::create_db"],
+      notify      => Exec["puppetdashboard::package::grant_db_privs"],
+      refreshonly => true,
+    }
+    exec {"puppetdashboard::package::grant_db_privs":
+      command     => "echo 'GRANT ALL PRIVILEGES ON ${puppetdashboard::params::dashboard_db_name}.* TO \'${puppetdashboard::params::dashboard_db_username}\'@\'localhost\';' | mysql -u root",
+      require     => Exec["puppetdashboard::package::create_db"],
+      refreshonly => true,
+      notify      => Exec["puppetdashboard::package::dashboard_configure"],
+    }
   }
   file { "puppetdashboard::package::dashboard_database_config":
     path    => "/etc/puppet-dashboard/database.yml",

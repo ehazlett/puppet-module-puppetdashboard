@@ -40,7 +40,7 @@ class puppetdashboard::package {
   }
   package { "puppet-dashboard":
     ensure    => installed,
-    require   => File["puppetdashboard::config::puppetlabs_apt_repo_config"],
+    require   => Exec["puppetdashboard::config::puppetlabs_apt_repo_config"],
   }
   # mysql config
   exec { "puppetdashboard::package::create_db":

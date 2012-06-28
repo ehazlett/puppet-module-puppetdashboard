@@ -6,19 +6,6 @@ class puppetdashboard::package {
     logoutput => on_failure,
   }
 
-  if ! defined(Package["build-essential"]) { package { "build-essential": ensure => installed, } }
-  if ! defined(Package["libmysql-ruby"]) { package { "libmysql-ruby": ensure => installed, } }
-  if ! defined(Package["libmysqlclient-dev"]) { package { "libmysqlclient-dev": ensure => installed, } }
-  if ! defined(Package["libopenssl-ruby"]) { package { "libopenssl-ruby": ensure => installed, } }
-  if ! defined(Package["libreadline-ruby"]) { package { "libreadline-ruby": ensure => installed, } }
-  if ! defined(Package["mysql-server"]) { package { "mysql-server": ensure => installed, } }
-  if ! defined(Package["rake"]) { package { "rake": ensure => installed, } }
-  if ! defined(Package["rdoc"]) { package { "rdoc": ensure => installed, } }
-  if ! defined(Package["ri"]) { package { "ri": ensure => installed, } }
-  if ! defined(Package["ruby"]) { package { "ruby": ensure => installed, } }
-  if ! defined(Package["rubygems"]) { package { "rubygems": ensure => installed, } }
-  if ! defined(Package["ruby-dev"]) { package { "ruby-dev": ensure => installed, } }
-
   # exec { "puppetdashboard::package::wget_rubygems":
   #     cwd       => "/tmp",
   #     command   => "wget ${puppetdashboard::params::rubygems_url} -O rubygems.tar.gz",
@@ -56,6 +43,10 @@ class puppetdashboard::package {
   }
   # mysql config
   if ($puppetdashboard::config_mysql) {
+    if ! defined(Package["mysql-server"]) { package { "mysql-server": ensure => installed, } }
+    if ! defined(Package["libmysqlclient-dev"]) { package { "libmysqlclient-dev": ensure => installed, } }
+    if ! defined(Package["libmysql-ruby"]) { package { "libmysql-ruby": ensure => installed, } }
+
     exec { "puppetdashboard::package::create_db":
       command     => "echo 'CREATE DATABASE ${puppetdashboard::params::dashboard_db_name} CHARACTER SET utf8;' | mysql -u root",
       require     => [ Package["mysql-server"], Package["puppet-dashboard"] ],

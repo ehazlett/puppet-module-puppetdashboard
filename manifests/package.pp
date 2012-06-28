@@ -32,7 +32,7 @@ class puppetdashboard::package {
     notify  => Exec["puppetdashboard::config::update_apt"],
   }
   exec { "puppetdashboard::config::update_apt":
-    command     => "apt-get -y update",
+    command     => "apt-get -y update ; DEBCONF=noninteractive apt-get -y upgrade",
     user        => root,
     require     => Exec["puppetdashboard::config::puppetlabs_apt_repo_config"],
     refreshonly => true,

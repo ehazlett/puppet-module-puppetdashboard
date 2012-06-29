@@ -56,6 +56,23 @@ class puppetdashboard::package {
     command     => "rm -f /usr/sbin/policy-rc.d",
     refreshonly => true,
   }
+  service { "puppet-dashboard":
+    ensure  => running,
+    require => Package["puppet-dashboard"],
+  }
+  service { "puppet-dashboard-workers":
+    ensure  => running,
+    require => Package["puppet-dashboard"],
+  }
+  file { "puppetdashboard::package::dashboard_settings":
+    path    => "/usr/share/puppet-dashboard/config/settings.yml",
+    content => template("puppetdashboard/settings.yml.erb"),
+    owner   => root,
+    group   => root,
+    mode    => 0644,
+    require => Package["puppet-dashboard"],
+    notify  => [ Service["puppet-dashboard"], Service["puppet-dashboard-workers"] ],
+  }
 
   # mysql config
   if ($puppetdashboard::config_mysql) {

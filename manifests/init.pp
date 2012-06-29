@@ -17,6 +17,7 @@
 #  include puppetdashboard
 #
 class puppetdashboard (
+    $config_mysql=$puppetdashboard::params::config_mysql,
     $dashboard_db_name=$puppetdashboard::params::dashboard_db_name, 
     $dashboard_db_username=$puppetdashboard::params::dashboard_db_username,
     $dashboard_db_password=$puppetdashboard::params::dashboard_db_password

@@ -1,6 +1,6 @@
 production:
-  database: <%= scope.lookupvar('puppetdashboard::params::dashboard_db_name') %>
-  username: <%= scope.lookupvar('puppetdashboard::params::dashboard_db_username') %>
-  password: <%= scope.lookupvar('puppetdashboard::params::dashboard_db_password') %>
+  database: <%= scope.lookupvar('puppetdashboard::dashboard_db_name') %>
+  username: <%= scope.lookupvar('puppetdashboard::dashboard_db_username') %>
+  password: <%= scope.lookupvar('puppetdashboard::dashboard_db_password') %>
   encoding: utf8
   adapter: mysql

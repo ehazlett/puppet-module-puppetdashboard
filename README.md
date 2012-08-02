@@ -2,6 +2,8 @@
 
 This installs and configures the Puppet Dashboard.
 
+** Tested on Ubuntu
+
 ## Usage
 
 Basic
